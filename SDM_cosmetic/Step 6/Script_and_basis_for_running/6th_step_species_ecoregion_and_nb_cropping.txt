@@ -1,0 +1,23 @@
+import arcpy
+import arcinfo
+from arcpy import env
+from arcpy.sa import *
+import os
+arcpy.CheckOutExtension('Spatial')
+arcpy.MakeFeatureLayer_management ("C:/Users/190384/Desktop/Ecoregions2017.lyr","ECOR_lyr")
+for filename in os.listdir("C:/Users/190384/Desktop/Occurrences_corrected"):
+    if filename.endswith(".csv"):
+        arcpy.env.workspace = "C:/Users/190384/Desktop/Occurrences_corrected"
+        fileXY=filename+"_XY_data"
+        fileFC=filename+"_feature_class"
+        arcpy.MakeXYEventLayer_management(filename, "Longitude", "Latitude", fileXY)
+        file=filename[:-4]
+        arcpy.CopyFeatures_management(fileXY,fileFC)
+        arcpy.SelectLayerByLocation_management ("ECOR_lyr","CONTAINS", file+".shp")
+        ecoregion=file+"_ecoregions"
+        arcpy.Select_analysis ("ECOR_lyr","C:/Users/190384/Desktop/Species_ecoregions/"+ecoregion+".shp")
+        arcpy.SelectLayerByLocation_management ("ECOR_lyr","BOUNDARY_TOUCHES", "C:/Users/190384/Desktop/Species_ecoregions/"+ecoregion+".shp")
+        nb=ecoregion+"_and_nb"
+        arcpy.Select_analysis ("ECOR_lyr", "C:/Users/190384/Desktop/Species_ecoregions_and_nb/"+ nb+".shp")
+arcpy.CheckInExtension('Spatial')        
+    

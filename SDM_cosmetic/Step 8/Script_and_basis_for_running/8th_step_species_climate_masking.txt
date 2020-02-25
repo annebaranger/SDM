@@ -1,0 +1,25 @@
+import arcpy
+import arcinfo
+from arcpy import env
+from arcpy.sa import *
+import os
+import csv
+arcpy.CheckOutExtension('Spatial')
+for shapefile in os.listdir("S:/Utilisateurs/NOIRAULT_a/Data/species_eco_nb_a_faire"):
+    if shapefile.endswith(".shp"):
+        print(shapefile)
+        with open("C:/Users/190384/Desktop/species_crop_to_do.csv") as csvfile:
+            reader = csv.reader(csvfile, delimiter=';')
+            for row in reader:
+                shapefilename=shapefile[15:]
+                shapefilename=shapefilename[:-22]
+                if row[0]==shapefilename:
+                    for lines in row[1:]:
+                        if lines!="NA":
+                            filename="S:/Utilisateurs/NOIRAULT_a/Data/climat_tif/"+lines+"_aggregate5.tif"
+                            env.workspace = "S:/Utilisateurs/NOIRAULT_a/Data/species_eco_nb_a_faire"
+                            outextract=ExtractByMask (filename,"S:/Utilisateurs/NOIRAULT_a/Data/species_eco_nb_a_faire/"+shapefile)
+                            outextract.save("S:/Utilisateurs/NOIRAULT_a/Data/climate_extraction_per_spe_to_do/"+shapefilename+"_"+lines+".tif")
+                    break
+arcpy.CheckInExtension('Spatial')
+
